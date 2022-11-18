@@ -10,19 +10,36 @@ import styles from '../styles/Home.module.css';
 const Home: NextPage = () => {
   const [balance, setBalance] = useState(0)
   const [address, setAddress] = useState('')
+  const [executable, setExecutable] = useState('')
 
-  const addressSubmittedHandler = (address: string) => {
+  const addressSubmittedHandler = async (address: string) => {
+    let connection: Web3.Connection
+    let key: Web3.PublicKey
+
+    try {
+      connection = new Web3.Connection(Web3.clusterApiUrl('devnet'))
+      key = new Web3.PublicKey(address)
+    } catch (error) {
+      console.error('Failed to initialize account/connection:', error)
+      return
+    }
+
     try {
       setAddress(address)
-      const key = new Web3.PublicKey(address)
-      const connection = new Web3.Connection(Web3.clusterApiUrl('devnet'))
-      connection.getBalance(key).then(balance => {
-        setBalance(balance / Web3.LAMPORTS_PER_SOL)
-      })
+      let balance = await connection.getBalance(key)
+      setBalance(balance / Web3.LAMPORTS_PER_SOL)
     } catch (error) {
       setAddress('')
       setBalance(0)
       alert(error)
+    }
+
+    try {
+      const accountInfo = await connection.getAccountInfo(key)
+      console.log('Account info:', accountInfo)
+      setExecutable(accountInfo!.executable)
+    } catch (error) {
+      console.error('Failed to retrieve account info:', error)
     }
   }
 
@@ -35,6 +52,7 @@ const Home: NextPage = () => {
         <AddressForm handler={addressSubmittedHandler} />
         <p>{`Address: ${address}`}</p>
         <p>{`Balance: ${balance} SOL`}</p>
+        <p>{`Smart Contract: ${executable}`}</p>
       </header>
     </div>
   )
