@@ -1,8 +1,11 @@
-import type { NextPage } from 'next'
-import { useState } from 'react'
-import styles from '../styles/Home.module.css'
-import AddressForm from '../components/AddressForm'
-import * as Web3 from '@solana/web3.js'
+import { useState } from 'react';
+
+import type { NextPage } from 'next';
+
+import * as Web3 from '@solana/web3.js';
+
+import AddressForm from '../components/AddressForm';
+import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
   const [balance, setBalance] = useState(0)
